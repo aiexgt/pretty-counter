@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme Switch
     const themeCheckbox = document.getElementById('checkbox');
 
+    // PiP Elements
+    const btnPip = document.getElementById('btn-pip');
+    const appContainer = document.querySelector('.app-container');
+    let pipWindow = null;
+
     // 2. Application State
     const defaultState = {
         counter: 0,
@@ -42,6 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Sincronizar el input inicial con el estado al cargar
         initialInput.value = state.counter;
+
+        // Validar soporte Document PiP
+        if ('documentPictureInPicture' in window) {
+            btnPip.style.display = 'inline-flex';
+        }
     }
 
     // 4. LocalStorage Management
@@ -213,9 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyTheme(themeName) {
         if (themeName === 'coquette') {
             document.body.setAttribute('data-theme', 'coquette');
+            if (pipWindow) pipWindow.document.body.setAttribute('data-theme', 'coquette');
             themeCheckbox.checked = true;
         } else {
             document.body.removeAttribute('data-theme');
+            if (pipWindow) pipWindow.document.body.removeAttribute('data-theme');
             themeCheckbox.checked = false;
         }
         state.theme = themeName;
@@ -242,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveState();
     });
 
-    // Validar input de incremento, para evitar números negativos
+    // Handle input validation on blur or enter key
     stepInput.addEventListener('change', () => {
         const val = parseInt(stepInput.value, 10);
         if (isNaN(val) || val < 1) {
@@ -257,6 +269,66 @@ document.addEventListener('DOMContentLoaded', () => {
             initialInput.blur(); // Quitar focus para cerrar teclado movil
         }
     });
+
+    // Toggle Picture-in-Picture logic
+    if (btnPip) {
+        btnPip.addEventListener('click', async () => {
+            if (pipWindow) {
+                pipWindow.close();
+                return;
+            }
+
+            try {
+                pipWindow = await window.documentPictureInPicture.requestWindow({
+                    width: 480,
+                    height: 650
+                });
+
+                // Copiar las hojas de estilo importantes al head de PiP
+                [...document.styleSheets].forEach((styleSheet) => {
+                    try {
+                        let link;
+                        if (styleSheet.href) {
+                            link = document.createElement('link');
+                            link.rel = 'stylesheet';
+                            link.href = styleSheet.href;
+                            pipWindow.document.head.appendChild(link);
+                        }
+                    } catch (e) {
+                        console.warn(e);
+                    }
+                });
+
+                // Sincronizar clases globales para estilos (Ej: font-family del body)
+                pipWindow.document.body.style.display = 'flex';
+                pipWindow.document.body.style.flexDirection = 'column';
+                pipWindow.document.body.style.alignItems = 'center';
+                pipWindow.document.body.style.justifyContent = 'center';
+                pipWindow.document.body.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
+
+                // Sincronizar el tema actual
+                if (document.body.hasAttribute('data-theme')) {
+                    pipWindow.document.body.setAttribute('data-theme', 'coquette');
+                }
+
+                // Ocultar el botón temporalmente mientras estamos en modo PiP
+                btnPip.style.display = 'none';
+
+                // Mover contenedor y notificar
+                pipWindow.document.body.appendChild(appContainer);
+
+                // Escuchar el evento de cerrado natural
+                pipWindow.addEventListener('pagehide', () => {
+                    document.body.appendChild(appContainer);
+                    btnPip.style.display = 'inline-flex';
+                    pipWindow = null;
+                });
+            } catch (err) {
+                console.error("Fallo al iniciar Document PiP", err);
+                alert("Tu navegador no soporta o bloqueó la ventana flotante.");
+            }
+        });
+    }
 
     // 8. Bootstrap Application
     init();

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador Dinámico</title>
+    <meta name="description" content="Una aplicación de contador dinámico con temas personalizables.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" aria-label="Cambiar tema" />
+            <div class="slider round">
+                <span class="coquette-icon">🎀</span>
+                <span class="minimal-icon">✨</span>
+            </div>
+        </label>
+        <span class="theme-label">Estilo Actual</span>
+    </div>
+
+    <main class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">Contador</h1>
+            <div class="bow-decoration" aria-hidden="true">🎀</div>
+        </header>
+
+        <section class="counter-display">
+            <h2 id="counter-value" class="value">0</h2>
+        </section>
+
+        <section class="controls-main">
+            <button id="btn-subtract" class="btn btn-action" aria-label="Restar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="icon"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <button id="btn-reset" class="btn btn-secondary" aria-label="Reiniciar a cero">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="icon"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button id="btn-add" class="btn btn-action" aria-label="Sumar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="icon"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+        </section>
+
+        <section class="settings-panel">
+            <div class="input-group">
+                <label for="step-input">Incremento</label>
+                <input type="number" id="step-input" value="1" min="1">
+            </div>
+            <div class="input-group">
+                <label for="initial-input">Valor Inicial</label>
+                <input type="number" id="initial-input" value="0">
+                <button id="btn-set-initial" class="btn btn-small">Ajustar</button>
+            </div>
+        </section>
+
+        <section class="history-panel">
+            <div class="history-header">
+                <h3>Historial</h3>
+                <button id="btn-clear-history" class="btn btn-text">Borrar todo</button>
+            </div>
+            <ul id="history-list" class="history-list" aria-live="polite">
+                <!-- El historial se renderiza aquí -->
+            </ul>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
